@@ -1,0 +1,53 @@
+name: SCA Security Pipeline
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  sca-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ✅ Checkout code
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # ✅ Setup Java
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      # ✅ Install tools
+      - name: Install prerequisites
+        run: sudo apt-get update && sudo apt-get install -y unzip wget
+
+      # ✅ Download Dependency-Check
+      - name: Download Dependency-Check
+        run: |
+          wget https://github.com/jeremylong/DependencyCheck/releases/download/v9.0.9/dependency-check-9.0.9-release.zip -O dc.zip
+
+      # ✅ Extract tool
+      - name: Extract Dependency-Check
+        run: unzip dc.zip
+
+      # ✅ Run SCA scan (NO API KEY)
+      - name: Run Dependency-Check
+        run: |
+          chmod +x ./dependency-check/bin/*.sh
+          mkdir -p reports
+          ./dependency-check/bin/dependency-check.sh \
+            --project "SCA Demo Pipeline" \
+            --scan . \
+            --format "HTML" \
+            --out reports \
+            --noupdate
+
+      # ✅ Upload report
+      - name: Upload Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: reports/dependency-check-report.html
