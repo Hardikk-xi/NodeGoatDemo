@@ -9,28 +9,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # ✅ Step 1: Checkout repository
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      # ✅ Step 2: Set up Java (required)
       - name: Set up Java
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      # ✅ FIX: Ensure unzip exists
-      - name: Install unzip
+      # ✅ Step 3: Install required tools
+      - name: Install prerequisites
         run: sudo apt-get update && sudo apt-get install -y unzip wget
 
-      # ✅ FIX: Download properly
+      # ✅ Step 4: Download Dependency-Check (FIXED VERSION ✅)
       - name: Download Dependency-Check
-        run: wget -O dc.zip https://github.com/jeremylong/DependencyCheck/releases/latest/download/dependency-check.zip
+        run: |
+          wget https://github.com/jeremylong/DependencyCheck/releases/download/v9.0.9/dependency-check-9.0.9-release.zip -O dc.zip
 
-      # ✅ FIX: Extract properly
+      # ✅ Step 5: Extract tool
       - name: Extract Dependency-Check
         run: unzip dc.zip
 
-      # ✅ RUN SCAN
+      # ✅ Step 6: Run SCA Scan
       - name: Run Dependency-Check
         run: |
           ./dependency-check/bin/dependency-check.sh \
@@ -39,7 +42,7 @@ jobs:
           --format HTML \
           --out .
 
-      # ✅ Upload report (v4 correct)
+      # ✅ Step 7: Upload Report (FIXED v4 ✅)
       - name: Upload Report
         uses: actions/upload-artifact@v4
         with:
