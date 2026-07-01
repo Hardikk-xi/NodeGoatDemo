@@ -33,7 +33,17 @@ jobs:
       - name: Extract Dependency-Check
         run: unzip dc.zip
 
-      # ✅ Step 6: Run scan (NO API KEY, NO UPDATE ✅)
+      # ✅ Step 6: Initial DB Setup (FIRST RUN ONLY ✅)
+      - name: Initialize Database
+        run: |
+          chmod +x ./dependency-check/bin/*.sh
+          ./dependency-check/bin/dependency-check.sh \
+            --project "DB Init" \
+            --scan . \
+            --format "HTML" \
+            --out ./init-report
+
+      # ✅ Step 7: Actual Scan (NO UPDATE ✅)
       - name: Run Dependency-Check
         run: |
           chmod +x ./dependency-check/bin/*.sh
@@ -45,9 +55,10 @@ jobs:
             --out ./reports \
             --noupdate
 
-      # ✅ Step 7: Upload report
+      # ✅ Step 8: Upload report
       - name: Upload Report
         uses: actions/upload-artifact@v4
         with:
           name: dependency-check-report
           path: reports/dependency-check-report.html
+``
