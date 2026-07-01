@@ -53,6 +53,10 @@ jobs:
           # Run update-only to create the DB into the project-local folder
           ./dependency-check/bin/dependency-check.sh --update-only --data ./dependency-check-data
 
+      # Verify Dependency-Check Installation
+      - name: Verify Dependency-Check Installation
+        run: ./dependency-check/bin/dependency-check.sh --version
+
       # Run scan using the cached/initialized DB and prevent live updates
       - name: Run Dependency-Check
         run: |
@@ -61,7 +65,7 @@ jobs:
           ./dependency-check/bin/dependency-check.sh \
             --project "GitHub SCA Scan" \
             --scan . \
-            --format HTML \
+            --format "HTML" \
             --out ./reports \
             --data ./dependency-check-data \
             --noupdate
