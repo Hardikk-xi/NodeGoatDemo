@@ -57,17 +57,19 @@ jobs:
       - name: Run Dependency-Check
         run: |
           chmod +x ./dependency-check/bin/*.sh
+          mkdir -p ./reports
           ./dependency-check/bin/dependency-check.sh \
             --project "GitHub SCA Scan" \
             --scan . \
             --format HTML \
-            --out . \
+            --out ./reports \
             --data ./dependency-check-data \
             --noupdate
 
       # Upload report
       - name: Upload Report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: dependency-check-report
-          path: dependency-check-report.html
+          path: reports/dependency-check-report.html
