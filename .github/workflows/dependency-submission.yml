@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # ✅ Step 1: Checkout repository
+      # ✅ Step 1: Checkout code
       - name: Checkout Code
         uses: actions/checkout@v3
 
@@ -20,29 +20,30 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      # ✅ Step 3: Install required tools
+      # ✅ Step 3: Install tools
       - name: Install prerequisites
         run: sudo apt-get update && sudo apt-get install -y unzip wget
 
-      # ✅ Step 4: Download Dependency-Check (FIXED VERSION ✅)
+      # ✅ Step 4: Download Dependency-Check (stable version)
       - name: Download Dependency-Check
         run: |
           wget https://github.com/jeremylong/DependencyCheck/releases/download/v9.0.9/dependency-check-9.0.9-release.zip -O dc.zip
 
-      # ✅ Step 5: Extract tool
+      # ✅ Step 5: Extract
       - name: Extract Dependency-Check
         run: unzip dc.zip
 
-      # ✅ Step 6: Run SCA Scan
+      # ✅ Step 6: Run SCA Scan (WITH API KEY ✅)
       - name: Run Dependency-Check
         run: |
           ./dependency-check/bin/dependency-check.sh \
           --project "GitHub SCA Scan" \
           --scan . \
           --format HTML \
-          --out .
+          --out . \
+          --nvdApiKey ${{ secrets.NVD_API_KEY }}
 
-      # ✅ Step 7: Upload Report (FIXED v4 ✅)
+      # ✅ Step 7: Upload report (v4 ✅)
       - name: Upload Report
         uses: actions/upload-artifact@v4
         with:
