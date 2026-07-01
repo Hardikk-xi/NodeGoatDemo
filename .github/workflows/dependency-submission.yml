@@ -1,42 +1,38 @@
-name: Dependency Submission
-on:
-  # Trigger on push to the main branch
-  push:
-    branches:
-      - main
-  # Allow manual trigger for testing
-  workflow_dispatch:
+name: Dependency Check Scan
 
-permissions:
-  contents: write # Required for submitting the snapshot to GitHub
+on:
+  push:
+  pull_request:
 
 jobs:
-  submit-dependencies:
+  sca-scan:
     runs-on: ubuntu-latest
 
-    env:
-      SNAPSHOT_FILE_PATH: 'output.json'
-    
     steps:
-      - name: ⬇️ Checkout Repository
-        uses: actions/checkout@v4
-        
-      - name: 🛠️ Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          # Use an actively supported LTS version for better compatibility
-          node-version: '20' 
-          
-      - name: 📦 Install Dependencies & Update Lock File (Secure)
-        # Guarantees package-lock.json is up-to-date. --ignore-scripts maintains security.
-        run: |
-          rm -rf node_modules
-          rm -f package-lock.json
-          npm install --ignore-scripts --force-lock
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-      - name: ⚙️ Generate and Submit Dependency Snapshot
-        # 🔑 CORRECTED ACTION PATH IS HEREE 🔑
-        uses: advanced-security/component-detection-dependency-submission-action@d433c2f467e149a8009c8fbce92cc708ed15ef7b
+      - name: Install Java (Required)
+        uses: actions/setup-java@v3
         with:
-          # Writes the snapshot to the path defined in the env block
-          detectorsFilter: "Npm,NpmLockfile3"
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install Dependency-Check
+        run: |
+          wget https://github.com/jeremylong/DependencyCheck/releases/latest/download/dependency-check.zip
+          unzip dependency-check.zip
+
+      - name: Run SCA Scan
+        run: |
+          ./dependency-check/bin/dependency-check.sh \
+          --project "GitHub Scan" \
+          --scan . \
+          --format HTML \
+          --out .
+
+      - name: Upload Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: dependency-check-report
+          path: dependency-check-report.html
