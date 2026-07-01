@@ -42,8 +42,7 @@ jobs:
             --project "SCA Demo Pipeline" \
             --scan . \
             --format "HTML" \
-            --out reports \
-            --noupdate
+            --out reports
 
       # ✅ Upload report
       - name: Upload Report
