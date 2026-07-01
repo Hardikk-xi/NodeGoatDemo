@@ -53,7 +53,7 @@ jobs:
             --scan . \
             --format "HTML" \
             --out ./reports \
-            --noupdate
+           
 
       # ✅ Step 8: Upload report
       - name: Upload Report
